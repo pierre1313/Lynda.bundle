@@ -1,7 +1,5 @@
 # PMS plugin framework
 from PMS import *
-from PMS.Objects import *
-from PMS.Shortcuts import *
 
 ####################################################################################################
 
