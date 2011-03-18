@@ -1,0 +1,21 @@
+[
+    {
+        "id": "username",
+        "type": "text",
+        "label": "Your Username",
+        "default": "" 
+    },
+    {
+        "id": "password",
+        "type": "text",
+        "label": "Your Password",
+        "default": "",
+         "option":"hidden"
+    },
+    {
+        "id": "autologin",
+        "type": "bool",
+        "label": "Remember me",
+        "default": "False" 
+    }
+]

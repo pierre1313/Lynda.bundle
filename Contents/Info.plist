@@ -23,7 +23,7 @@
 	<key>PlexClientPlatforms</key>
 	<string>MacOSX,LGTV</string>
 	<key>PlexFrameworkVersion</key>
-	<string>1</string>
+	<string>2</string>
 	<key>PlexMediaContainer</key>
 	<array>
 		<string>FLV</string>
@@ -37,5 +37,7 @@
 	<array>
 		<string>H.264</string>
 	</array>
-</dict>
+	</dict>
 </plist>
+
+
