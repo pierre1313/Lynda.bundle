@@ -32,7 +32,6 @@ def Start():
     
     data = page_content[page_content.find("var data = ")+11:]
     data = data[:data.find('};')+1]
-    Log(data)
     
     Dict['courseCatalog'] = JSON.ObjectFromString(data)
 
@@ -40,60 +39,24 @@ def ValidatePrefs():
     u = Prefs['username']
     p = Prefs['password']
     if (u and p):
-      L = Login(username=u,password=p)
-      Log(L)
-      if L == True:
+      if Login(username=u,password=p) == True:
 	    return MessageContainer("Success","You are now logged in, please enjoy the videos")
       else:
         return MessageContainer("Error","You need to provide a valid username and password. Please register at http://www.lynda.com.") 
 
 def Login(username,password):
-  valuesLogIn = dict()
-  valuesLogOut = dict()
-  alreadyLoggedIn = False
-  
-  try:
-    address = HTML.ElementFromURL('http://www.lynda.com/login/LoginError.aspx',cacheTime=0).xpath('//link[@rel="canonical"]')[0].get('href')
-  except: 
-    return False
-    
-  for input in  HTML.ElementFromURL(address,cacheTime=0).xpath('//form[@id="aspnetForm"]//input[@name]'):
-    field_name = input.get('name')
-    Log(field_name)
-    value = input.get('value')
-    
-    if field_name.find("btnLogOut") != -1:
-      alreadyLoggedIn = True
-    
-    if field_name != None and field_name.find('oogle')==-1:
-      if field_name.find("Username") != -1:
-        valuesLogIn[field_name] = str(username)
-      elif field_name.find("Password") != -1:
-        valuesLogIn[field_name] = str(password)
-      elif field_name.find("btnLogin") != -1:
-        valuesLogIn[field_name+'.x'] = '36' 
-        valuesLogIn[field_name+'.y'] = '9'
-      elif value == None:
-        valuesLogIn[field_name] = ''
-      else:
-        valuesLogIn[field_name] = value
+	valuesLogIn = {"username":username,"password":password,"stayPut":"True"}
 
-  if alreadyLoggedIn == False:
-    response = HTTP.Request('http://www.lynda.com/login/LoginError.aspx',values=valuesLogIn,cacheTime=0).content
-
-    if (response.find('Login Error')==-1) & (response.find('An Error Has Occurred')==-1) & (response!=None):
-      return True
-    else:
-      Log(response)
-      return False
-  else:
-    return True
+	response = HTTP.Request('http://www.lynda.com/user/login/modal',values=valuesLogIn,cacheTime=0).content
+    
+	if 'rror' in response:
+	  return False
+	else:
+	  return True
 
 def VideoMainMenu():
 
     dir = MediaContainer(viewGroup="List")
-
-    dir.Append(Function(DirectoryItem(CourseList,"All Courses",subtitle="Browse all the available courses in the Online Training Library",summary="Browse all the available courses in the Online Training Library")))
 
     dir.Append(Function(DirectoryItem(BrowseBy,"Browse by Subject ...",subtitle="Browse the Online Training Library by subject",summary="Browse the Online Training Library by subject"),BrowseCategory = 'Subjects'))
     dir.Append(Function(DirectoryItem(BrowseBy,"Browse by Software ...",subtitle="Browse the Online Training Library by software",summary="Browse the Online Training Library by software"),BrowseCategory = 'Software'))
@@ -117,7 +80,6 @@ def BrowseBy(sender, BrowseCategory):
       name = Dict['courseCatalog']['sections'][BrowseCategory][str(entry)]['name']
       if name != '':
         sortindex = Dict['courseCatalog']['sections'][BrowseCategory][str(entry)]['sort']
-        Log(entry)
         dir.Append(Function(DirectoryItem(CourseList,name,subtitle = sortindex),filterKey=filters[BrowseCategory],filterVal = entry))
         dir.Sort('subtitle')
     return dir
