@@ -32,6 +32,7 @@ def Start():
     
     data = page_content[page_content.find("var data = ")+11:]
     data = data[:data.find('};')+1]
+    data = data.replace(', ,',',')
     
     Dict['courseCatalog'] = JSON.ObjectFromString(data)
 
@@ -101,19 +102,20 @@ def CourseList(sender,filterKey='', filterVal=0, PageNum = 0, pagesEnabled = Fal
 def CourseDetails(sender, courseid = 0):
 
     dir = MediaContainer(viewGroup="List")
-    html = HTTP.Request('http://www.lynda.com/home/CourseDetails.ashx?fn=1&cid=%s&aid=67&cc=&_=1285450832173&{} '%courseid,cacheTime=0).content.replace('<span','<div id="chapter"><span').replace('</table>','</table></div>').replace('<table id="head"','<div><table id="head"')
-    Content = HTML.ElementFromString(html).xpath('//div[@id="chapter"]')
-    for entry in Content:
-      chapterTitle = entry.xpath('a[@class="a"]')[0].text.strip()
+    html = HTTP.Request('http://www.lynda.com/ajax/CourseDetails.aspx?fn=1&cid=%s&aid=98&cc=&_=1301643565834&{} '%courseid,cacheTime=0).content.replace('</table>','</table></div>').replace("<div  class='chapterDiv' >",' <div class="MychapterDiv"><div  class="chapterDiv" >')
+    for entry in HTML.ElementFromString(html).xpath('//div[@class="MychapterDiv"]'):
+      Log(HTML.StringFromElement(entry))
+      chapterTitle = entry.xpath('//a[@class="a"]')[0].text.strip()
       for course in entry.xpath('table//a'):
         link = course.get('onclick')
         courseTitle = chapterTitle + ' - ' + course.text
-        if link.find('lpk4=') == -1:
+        if 'lpk4' in link:
+          chapterid = link[link.find('lpk4=')+5:link.find("',")]
+          Log(chapterid)
+          dir.Append(Function(VideoItem(PlayVideo,courseTitle),chapterid = chapterid))
+        else:
           courseTitle = '$$$ - ' + courseTitle
           dir.Append(Function(DirectoryItem(PopupMessage,courseTitle)))
-        else:
-          chapterid = link[link.find('lpk4=')+5:link.find("',")]
-          dir.Append(Function(VideoItem(PlayVideo,courseTitle),chapterid = chapterid))
 
     return dir
 
