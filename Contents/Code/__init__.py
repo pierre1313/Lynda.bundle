@@ -50,7 +50,7 @@ def Login(username,password):
 
 	response = HTTP.Request('http://www.lynda.com/user/login/modal',values=valuesLogIn,cacheTime=0).content
     
-	if 'rror' in response:
+	if 'rror' in response or '<title>Log in to your account</title>' in response:
 	  return False
 	else:
 	  return True
