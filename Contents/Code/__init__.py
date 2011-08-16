@@ -46,9 +46,9 @@ def ValidatePrefs():
         return MessageContainer("Error","You need to provide a valid username and password. Please register at http://www.lynda.com.") 
 
 def Login(username,password):
-	valuesLogIn = {"username":username,"password":password,"stayPut":"True"}
+	valuesLogIn = {"username":username,"password":password,"stayPut":"False"}
 
-	response = HTTP.Request('http://www.lynda.com/user/login/modal',values=valuesLogIn,cacheTime=0).content
+	response = HTTP.Request('https://www.lynda.com/login/login.aspx',values=valuesLogIn,cacheTime=0).content
     
 	if 'rror' in response or '<title>Log in to your account</title>' in response:
 	  return False
